@@ -1,0 +1,748 @@
+\documentclass[a4paper,14pt,russian]{extarticle}
+\usepackage[T2A]{fontenc}
+\usepackage[cp1251]{inputenc}
+\usepackage[russian]{babel}
+\hoffset 0pt
+\voffset 0pt
+\usepackage[
+  a4paper, includehead, includefoot, mag=1000,
+  headsep=0mm, headheight=0mm,
+  left=25mm, right=15mm, top=20mm, bottom=20mm
+]{geometry}
+\usepackage[unicode, pdftex]{hyperref}
+\usepackage{pdfpages}
+\usepackage[onehalfspacing]{setspace} %"умное" расстояние между строк - установить 1.5 интервала от нормального
+\usepackage{cite}  %"умные" библиографические ссылки (сортировка и сжатие)
+\usepackage{indentfirst} %делать отступ в начале параграфа
+%%% Выравнивание и переносы %%%
+\sloppy % Избавляемся от переполнений
+\clubpenalty=10000 % Запрещаем разрыв страницы после первой строки абзаца
+\widowpenalty=10000 % Запрещаем разрыв страницы после последней строки абзаца
+\righthyphenmin=2 % Минимальное число символов при переносе - 2.
+\usepackage{fancyvrb}
+\usepackage{amssymb,amsmath,amsfonts,latexsym,mathtext} %расширенные наборы  математических символов
+\usepackage{amsthm}
+\theoremstyle{definition}
+\usepackage[tableposition=top]{caption}
+\DeclareCaptionLabelFormat{gostfigure}{Рисунок #2}
+\DeclareCaptionLabelFormat{gosttable}{Таблица #2}
+\DeclareCaptionLabelSeparator{gost}{~---~}
+\captionsetup{labelsep=gost}
+\captionsetup[figure]{labelformat=gostfigure}
+\captionsetup[table]{labelformat=gosttable}
+\usepackage{fancyhdr}
+\pagestyle{fancyplain}
+\renewcommand{\headrulewidth}{0pt}
+\fancyhf{}
+\rfoot{\fancyplain{}{\thepage}}
+\makeatletter 
+\makeatother
+\addtocontents{toc}{\protect\thispagestyle{fancyplain}}
+\usepackage{enumitem}
+\makeatletter
+    \AddEnumerateCounter{\asbuk}{\@asbuk}{м)}
+\makeatother
+\setlist{nolistsep}
+\renewcommand{\labelitemi}{-}
+\renewcommand{\labelenumi}{\asbuk{enumi})}
+\renewcommand{\labelenumii}{\arabic{enumii})}
+\newcommand{\biblio}{
+  \bibliographystyle{ugost2008}	% Оформляем библиографию в соответствии с ГОСТ 7.0.5
+  \nocite{*}
+  \bibliography{biblio}
+}
+
+
+
+
+
+
+\usepackage{pscyr}
+\renewcommand{\rmdefault}{ftm}
+\usepackage{setspace}
+\usepackage{tikz}
+\usetikzlibrary{graphs}
+\usetikzlibrary{shapes.geometric}
+\onehalfspacing
+\makeatletter
+\renewcommand*{\ps@plain}{%
+  \let\@mkboth\@gobbletwo
+  \let\@oddhead\@empty
+  \def\@oddfoot{%
+    \reset@font
+    \hfil
+    \thepage
+    % \hfil % removed for aligning to the right
+  }%
+  \let\@evenhead\@empty
+  \let\@evenfoot\@oddfoot
+}
+\makeatother
+\usepackage{color} %% это для отображения цвета в коде
+\usepackage{listings} %% собственно, это и есть пакет listings
+\usepackage{caption}
+\usepackage{tocloft}
+\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
+\DeclareCaptionFont{white}{\color{white}} %% это сделает текст заголовка белым
+%% код ниже нарисует серую рамочку вокруг заголовка кода.
+\DeclareCaptionFormat{listing}{\colorbox{gray}{\parbox{\textwidth}{#1#2#3}}}
+\captionsetup[lstlisting]{format=listing,labelfont=white,textfont=white}
+
+\begin{document}
+\includepdf[pages={1}]{titul.pdf}
+\begin{center}\tableofcontents\end{center}
+\newpage
+
+\section*{\large\begin{center}ОПРЕДЕЛЕНИЯ, ОБОЗНАЧЕНИЯ И СОКРАЩЕНИЯ\end{center}}
+
+\begin{itemize}
+\item[]\textbf{$y$} --- независимая координата(переменная),
+\item[]\textbf{$t$} --- время,
+\item[]\textbf{$u$} --- продольная (вдоль оси $Ox$) составляющая скорости жидкости,
+\item[]\textbf{$A = const$} --- ускорение,
+\item[]\textbf{$\eta$} --- независимая автомодельная переменная,
+\item[]\textbf{$\varphi(\eta)$} --- автомодельный представитель продольной скорости,
+\item[]\textbf{$\rho$} --- плотность жидкости,
+\item[]\textbf{$\mu$} --- динамический коэффициент вязкости жидкости,
+\item[]\textbf{$\nu = \mu/\rho$} --- кинематический коэффициент вязкости жидкости,
+\item[]\textbf{$\mu_*$} --- динамический коэффициент вязкости неньютоновской жидкости,
+\item[]\textbf{$U(x)$} --- распределение продольной составляющей скорости на внешней 
+\\границе пограничного слоя,
+\item[]\textbf{$U_{\infty}$} --- сокорость жидкости вдали от пластины
+\end{itemize}
+
+\newpage
+\section*{\begin{center}\largeВВЕДЕНИЕ\end{center}}
+\addcontentsline{toc}{section}{ВВЕДЕНИЕ}
+\par Пограничный слой (ПС) --- область течения вязкой жидкости (газа) с малой по сравнению с продольными размерами поперечной толщиной, появляющаяся у поверхности обтекаемого твёрдого тела или у границы раздела двух потоков жидкости с разлчными скоростями, температурами или химическим составом. Возникновение ПС связано с явлением переноса в жидкости количества движения, теплоты и массы, характеризуемых коэффциент вязкости, теплопроводности и диффузии. Образование и развитие ПС можно проследить на примере динамического (скоростного) ПС у поверхности 
+тела, обтекаемого потоком жидкостп или газа. Вследствие вязкости жидкости она прилипает к поверхности тела, т. е. на стенке продольная составляющая скорости жидкости равна нулю (если поверхность тела непроницаемая, то здесь равна нулю и поперечная составляющая скорости). Разрыв продольной составляющей скорости в вязкой жидкости существовать не может, поэтому возникает переходная область течения, т. е. ПС, в котором происходит плавное изменение скорости от нуля на стенке до некоторого конечного значения во внешнем потоке, где влияние вязкости исчезает.
+
+Введение ПС существенно упращает моделирование течения жидкости(газа) путём разделения потока на две области: тонкого вязкого пограничного слоя и области невязкого течения.
+
+В работе изучается задача о движении вязкой жидкости под действием пластины. Вначале речь идёт о ньютоновских жидкостях. Даётся постановка задачи и схема течения. Далее, в силу автомодельности изучаемого явления, задача сводится к краевой задаче для ОДУ. Краевая задача решается численным методом и изучается полученное решение. Затем аналогичным образом рассматривается случай со степенной неньютоновской жидкостью.
+ 
+\newpage
+\section{\largeФОРМУЛИРОВКА ЗАДАЧИ}%1
+Пусть в начале пластина и вязкая несжимаемая жидкость, занимающая полупространство над пластиной, покоятся. Затем плястина начинает равноускоренное движение с ускорением $A =\text const $. Требуется изучить течение вблизи пластины, когда жидкость является:
+\begin{itemize}
+\item[1.]ньютоновской,
+\item[2.]степенной неньютоновской.
+\end{itemize}
+
+Поместим начало декартовой системы координат в левом конце пластины в момент времени $t_0$, когда она находится в состоянии покоя. Ось $Ox$ направим вдоль пластины, а ось $Oy$ -- перепендикулярно ей. При $t > t_0$ пластина начинает равноускоренное движение. Схема течения до момента $t_0$ изображена на рисунке 1.1. На рисунке 1.2. изображена схема течения через некоторое время после момента $t_0$.
+Целью решения задачи является изучение влияния движения пластины на течение жидкости вблизи пластины и вдали от неё. 
+\newpage
+\begin{center}
+\includegraphics{1.png}
+
+Рисунок 1.1 - схема течения в начальный момент времени
+\end{center}
+
+\begin{center}
+\includegraphics{space.png}
+\end{center}
+
+\begin{center}
+\includegraphics{2.png}
+
+Рисунок 1.2 - схема течения через некоторое время после начального момента
+\end{center}
+
+\newpage
+\section{\largeСЛУЧАЙ НЬЮТОНОВСКИХ СРЕД}%2
+\subsection{\normalsizeПостановка задачи}%2.1
+Когда жидкость является обычной ньютоновской несжимаемой жидкостью, течение в пограничном слое описывается уравнением:
+
+\begin{equation*} \rho\frac{\partial u}{\partial t} = \mu\frac{\partial^2 u}{\partial y^2} \eqno(2.1) \end{equation*}
+или
+
+\begin{equation*} \frac{\partial u}{\partial t} = \nu\frac{\partial^2 u}{\partial y^2}, \eqno(2.1') \end{equation*}
+где $\nu = \mu/\rho$.
+
+Гранчные условия на поверхности пластины имеют вид
+
+\begin{equation*} при t > 0, \ y = 0: u = U = At. \eqno(2.2) \end{equation*}
+
+Граничные условия вдали от пластины (<<на бесконечности>>) имеют вид
+
+\begin{equation*} при t > 0, \ y \rightarrow \infty: u \rightarrow 0. \eqno(2.3) \end{equation*}
+
+Начальные условия:
+
+\begin{equation*} при t = 0, \ y \geqslant 0 : u = 0. \eqno(2.4) \end{equation*}
+
+\subsection{\normalsizeПостановка краевой задачи в автомодельных переменных}
+
+Введём масштабные величины. Пусть $T$ -- масштаб времени, $Y$ -- масштаб координаты $y$, $U$ -- масштаб продольной составляющей скорости жидкости. Тогда можно ввести безразмерные переменные по следующим формулам:
+ 
+
+\begin{equation*} t = T \ \overline{t}, \eqno(2.5) \end{equation*}
+\begin{equation*} y = Y \ \overline{y}, \eqno(2.6) \end{equation*}
+\begin{equation*} u = U \ \overline{u} = AT \ \overline{u}( \overline{t}, \ \overline{y}), \eqno(2.7) \end{equation*}
+где $ \ \overline{u}, \ \overline{t}, \ \overline{y}$ --- соответствующе безразмерные представители.
+
+Перейдём в уравнении $(2.1')$ к безразмерным переменным. Для этого подставим $(2.5)$ --- $(2.7)$ в $(2.1')$. Получим соотношение:
+
+\begin{equation*} \frac{AT}{T}\frac{\partial\overline{u}}{\partial\overline{t}} = \nu \frac{AT}{Y^2} \frac{\partial^2 \overline{u}}{\partial \overline{y}^2}. \eqno(2.8) \end{equation*}
+Запишем предыдущее выражение в упрощённом виде:
+
+\begin{equation*} \frac{\partial\overline{u}}{\partial\overline{t}} = \nu \frac{T}{Y^2} \frac{\partial^2 \overline{u}}{\partial \overline{y}^2}. \eqno(2.8') \end{equation*}
+Масштабы в левой и правой частях $(2.8')$ должны совпадать:
+
+\begin{equation*} 1 = \frac{\nu T}{Y^2}. \eqno(2.9) \end{equation*}
+Следовательно,
+\begin{equation*} Y = \sqrt{\nu T}. \eqno(2.10) \end{equation*}
+Подставляя $(2.5)$, $(2.6)$ и $(2.10)$ в $(2.7)$, получим
+\begin{equation*}
+u = AT \ \overline{u}\bigg(\frac{t}{T}, \ \frac{y}{\sqrt{\nu T}}\bigg).
+\end{equation*}
+В постановку задачи, то есть в уравнение $(2.1')$ и граничные условия $(2.2),(2.3)$ не входит масштаб времени $T$, поэтому в решении задачи для функции $u$ не должен входит масштаб $T$.
+Проведём ряд тождественных преобразований, которые позволят уменьшить присутствие масштаба времени $T$ в функции $u$:
+\begin{eqnarray*} u = AT\frac{t}{T}\frac{T}{t} \ \overline{u}\bigg(\frac{t}{T}, \ \frac{y}{\sqrt{\nu T}} \ \sqrt{\frac{T}{t}} \ \sqrt{\frac{t}{T}}\bigg) = \nonumber  \\ = At \ \overline{u} \bigg( \frac{t}{T}, \ \frac{y}{\sqrt{\nu T}} \ \frac{t}{T} \bigg)\ \frac{T}{t} = At \ g\bigg(\frac{t}{T}, \ \frac{y}{\sqrt{\nu t}}\bigg). \end{eqnarray*}
+
+Так как решение задачи для функции $u$ не зависеть от масштаба $T$, то функция $g$ в последнем выражении не зависит от первого аргумента. Тогда получаем следующее соотношение:
+
+\begin{equation*} u = At \varphi(\eta), \eqno(2.11) \end{equation*}
+где $\eta = \frac{y}{\sqrt{\nu t}}.$
+
+Вычислим частные производные от переменной $\eta$ по всем параметрам:
+
+\begin{equation*} \frac{\partial\eta}{\partial t} = \frac{\partial}{\partial t}\bigg( \frac{y}{\sqrt{\nu}} \ \frac{1}{\sqrt{t}} \bigg) = \ -\bigg(\frac{1}{2}\bigg) \frac{y}{\sqrt{\nu}}t^{-\big(\frac{3}{2}\big)} = \bigg(\frac{1}{2}\bigg) \ \frac{y}{\sqrt{\nu t}} t^{-1} = -\frac{\eta}{2t}, \eqno(2.12) \end{equation*}
+
+\begin{equation*} \frac{\partial\eta}{\partial y} = \frac{1}{\sqrt{\nu t}}. \eqno(2.13) \end{equation*}
+
+На основе полученных соотношений можно вычислить все частные прозводные функции $u$:
+
+\begin{equation*}
+1. \ \frac{\partial u}{\partial t} = \frac{\partial}{\partial t}(At\varphi(\eta)) = A\bigg( \varphi(\eta) + t\frac{\partial\varphi}{\partial t} \bigg),\eqno(2.14)
+\end{equation*}
+c учётом того, что
+\begin{equation*}
+\frac{\partial\varphi}{\partial t} = \frac{d\varphi}{d\eta}\frac{\partial\eta}{\partial t},
+\end{equation*}
+получаем c помощью $(2.12)$:
+
+\begin{equation*}
+\frac{\partial u}{\partial t} = A\bigg( \varphi(\eta) - \frac{\eta}{2}\frac{\partial\varphi}{\partial t} \bigg).
+\eqno(2.15)
+\end{equation*}
+
+\begin{equation*}
+2. \ \frac{\partial u}{\partial y} = \frac{\partial}{\partial y}(At\varphi(\eta)) = At\frac{\partial \varphi(\eta)}{\partial y} = At \ \frac{d\varphi}{d\eta} \ \frac{\partial \eta}{\partial y}.\eqno(2.16)
+\end{equation*}
+При подстановке $(2.13)$ в $(2.16)$ получим 
+\begin{equation*}
+\ \frac{\partial u}{\partial y} = At \ \frac{1}{\sqrt{\nu t}} \ \frac{d\varphi}{d\eta}.
+\end{equation*}
+А значит,
+\begin{equation*}
+\frac{\partial^2 u}{\partial y^2} = \frac{\partial}{\partial y}\bigg[ \frac{\partial u}{\partial y} \bigg] = \frac{\partial}{\partial y}\bigg[ At\frac{1}{\sqrt{\nu t}}\frac{d \varphi}{d \eta} \bigg] = \frac{A}{\nu}\frac{d^2\varphi}{d\eta^2}.
+\eqno(2.17)
+\end{equation*}
+
+
+Для получения дифференциального уравнения в автомодельных переменных подставим $(2.15)$, $(2.17)$ в $(2.1')$. После несложных преобразований получим 
+
+\begin{equation*}
+\ \frac{d^2\varphi}{d\eta^2} + \frac{\eta}{2} \ \frac{d\varphi}{d\eta} - \varphi = 0.
+\eqno(2.18)
+\end{equation*}
+
+Используя граничные условия $(2.2)$, $(2.3)$ и выражение для независимой автомодельной переменной $\eta$, составим граничные условия для функции $\varphi(\eta):$
+
+\begin{equation*}
+\text{при} \ \eta = 0:  \varphi(\eta) = 1,
+\eqno(2.19)
+\end{equation*}
+\begin{equation*}
+\text{при} \ \eta\rightarrow \infty: \varphi(\eta)\rightarrow 0.
+\eqno(2.20)
+\end{equation*}
+
+В итоге получаем краевую задачу $(2.18)$ --- $(2.20)$ с граничными условиями $(2.19)$, $(2.20).$
+Решение будем искать численным методом.
+
+\subsection{\normalsizeЧисленное решение краевой задачи}
+Воспользуемся методом пристрелки. Суть данного метода заключается в приведении краевой задачи $(2.18)$ --- $(2.20)$ к решению серии задач Коши до определённой точности ($\varepsilon$).
+
+Для начала воспользуемся граничными условиями $(2.19), \ (2.20)$. Пусть $a = 0$, $b$ --- достаточно большое число ($b \gg 1$), $\varphi(a) = \widetilde{\varphi}_0,  \ \varphi(b) =  \widetilde{\varphi}_1$. Тогда краевую задачу можно переписать следующим образом:
+
+\begin{equation*}
+\begin{cases}
+\frac{d^2\varphi}{d\eta^2} + \frac{\eta}{2} \ \frac{d\varphi}{d\eta} - \varphi = 0, \\
+\varphi(a) = 1 = \widetilde{\varphi}_0,\\
+\varphi(b) = 0 = \widetilde{\varphi}_1.
+\end{cases}
+\eqno(2.21)
+\end{equation*}
+
+Пусть теперь $\frac{d\varphi}{d\eta} = \psi$, тогда $\frac{d\psi}{d\eta} = \varphi - \frac{\eta}{2} \ \psi$. Положим в точке $a$ два условия. Одно условие уже есть в виде первого граничного условия в $(2.21)$, пусть также  $\alpha_0 = \psi(a) = \text{tg}\bigg( \frac{\widetilde{\varphi}_0 - \widetilde{\varphi}_1}{b - a} \bigg), \ \alpha_1 = \alpha_0 - \delta$, где $\delta$ - некоторое число. Тем самым получаем две задачи Коши в виде:
+
+\begin{equation*}
+\begin{cases}
+\frac{d\varphi}{d\eta} = f(\eta, \varphi, \psi) = \psi,\\
+\frac{d\psi}{d\eta} = g(\eta, \varphi, \psi) = \varphi - \frac{\eta}{2} \ \psi,\\
+\varphi(a) = \widetilde{\varphi}_0,\\
+\psi(a) = \alpha_0;
+\end{cases}
+\eqno(2.22)
+\end{equation*}
+
+\begin{equation*}
+\begin{cases}
+\frac{d\varphi}{d\eta} = f(\eta, \varphi, \psi) = \psi,\\
+\frac{d\psi}{d\eta} = g(\eta, \varphi, \psi) = \varphi - \frac{\eta}{2} \ \psi,\\
+\varphi(a) = \widetilde{\varphi}_0,\\
+\psi(a) = \alpha_1.
+\end{cases}
+\eqno(2.22')
+\end{equation*}
+
+Полученные $(2.22), (2.22')$ можно решить с помощью метода Рунге --- Кутты 4 -- го порядка. Пусть $\varphi(\eta,\widetilde{\varphi}_0,\alpha_0)$ --- решение $(2.22)$, а $\varphi(\eta,\widetilde{\varphi}_0,\alpha_1)$ --- решение $(2.22')$. 
+
+Данные решения соответственно удовлетворяют условиям в $(2.22)$ и $(2.22')$. Теперь необходимо, чтобы выполнялось условие в точке $b$ в $(2.21)$ для этих решений. Для этого введём функцию $\Phi(\alpha) = \varphi(b,\widetilde{\varphi}_0,\alpha) - \widetilde{\varphi}_1$. Если выполняется условие $|\Phi(\alpha)| \leq \varepsilon$, то краевая задача $(2.21)$ решена с точностью до $\varepsilon$. В противном случае находится новое приближение для $\alpha$, сделать это можно с помощью метода Ньютона:
+
+\begin{equation*}
+\alpha_{j+2} = \alpha_{j+1} - \frac{\alpha_{j+1} - \alpha_j}{\Phi(\alpha_{j+1}) - \Phi(\alpha_j)} \ \Phi(\alpha_{j+1}).
+\eqno(2.23)
+\end{equation*}
+
+
+Следует помнить, что метод Ньютона хорошо сходится только вблизи решения, то есть само получение результата сильно зависит от того, насколько удачным оказалось начальное приближение.
+
+Метод стрельбы применим для решения линейных и нелинейных задач и позволяет использовать хорошо разработанные алгоритмы для задач Коши. Трудности могут появиться в ситуациях, когда краевая задача хорошо обусловлена, а соответствующая задача Коши плохо обусловлена. В этом случае целесообразно поставить начальные условия на другом конце отрезка и с него начать процедуру решения. При отрицательном результате и в этом случае необходимо перейти к разностным методам.
+
+Блок-схема метода пристрелки приведена на рисунке 2.1. 
+
+
+\begin{center}
+\begin{tikzpicture}[node distance = 2cm, auto]
+block/.style={
+draw,
+fill=white,
+rectangle, 
+minimum width={width("Достаточно длинный текст, чтобы быть нормой")+2pt}
+}
+\draw (2,2.2) ellipse (2cm and 0.5cm);
+\node at (2,2.2) {Начало};
+\draw[thick,->]  (2,1.70) -- (2,1.05);
+\node [rectangle, draw, xslant=0.4] at (2,0.7) {\small Ввод исходных данных $a, b, \widetilde{\varphi}_0, \ \widetilde{\varphi}_1, \ \varepsilon $};
+\draw[thick,->]  (2,0.33) -- (2,-0.32);
+\node [rectangle, draw, xslant=0.4] at (2,-0.69) {\smallЗадание функций $f(\eta, \varphi, \psi)$ и $g(\eta, \varphi, \psi)$ для задачи Коши};
+\draw[thick,->]  (2,-1.08) -- (2,-1.73);
+\node [rectangle, draw,text width=25em,text centered] at (2,-2.85) {\smallСоставление 2--ух задач Коши с начальными условиями в точке $a$ и начальными приближениями параметра $\alpha$. Например, как это сделано в $(2.22), (2.22')$ };
+\draw[thick,->]  (2,-3.97) -- (2,-4.8);
+\node [rectangle, draw,text width=25em,text centered] at (2,-5.54) {\small Решение 2--ух первых задач Коши. Рассмотрение полученных решений в точке $b$};
+\draw[thick,->]  (2,-6.3) -- (2,-7);
+\node [draw, diamond, aspect=2,text width=5em,inner sep=2pt,text centered] at(2,-8.67) {\small $|\Phi(\alpha_0)| \leq \varepsilon$ или $|\Phi(\alpha_1)| \leq \varepsilon$};
+\draw[thick,->]  (-1.4,-8.67) -- (-2.5,-8.67);
+\node[] at (-2,-8.4) {\small Да};
+\node [rectangle, draw,text width=10em,text centered] at (-5.2,-8.7) {\small Краевая задача решена при параметре $\alpha_0$ или $\alpha_1$ в зависмости от соответствующего условия, который был выполнен на предыдущем шаге};
+\draw[thick,->]  (-5,-10.93) -- (-5,-11.58);
+\draw (-5,-12.07) ellipse (2cm and 0.5cm);
+\node at (-5,-12.07) {Конец};
+\draw[thick,->]  (2,-10.35) -- (2,-11);
+\node[] at (2.6,-10.6) {\small Нет};
+\node [rectangle, draw,text width=10em,text centered] at (2,-12.12){\small Нахождение нового приближения для параметра $\alpha$ по формуле $(2.23)$};
+\draw[thick,->]  (2,-13.24) -- (2,-13.89);
+\node [rectangle, draw,text width=10em,text centered] at (2,-15.35){\small Решение задачи Коши для нового $\alpha$ и рассмотрение полученного решения в точке $b$};
+\draw[thick,->]  (2,-16.85) -- (2,-17.4);
+\node [draw, diamond, aspect=2,text width=5em,inner sep=2pt,text centered] at(2,-18.3) {\small $|\Phi(\alpha)| \leq \varepsilon$ };
+\draw[thick,-]  (3.85,-18.3) -- (6.9,-18.3);
+\node[] at (5,-18) {\small Нет};
+\draw[thick,-]  (6.9,-18.3) -- (6.9,-12);
+\draw[thick,->]  (6.9,-12) -- (4.7,-12);
+\draw[thick,->]  (0.1,-18.3) -- (-2.8,-18.3);
+\node [rectangle, draw,text width=10em,text centered] at (-5.5,-18.35) {\small Краевая задача решена при последнем приближении параметра $\alpha$};
+\draw[thick,->]  (-5,-17.25) -- (-5,-12.55);
+\node[] at (-0.78,-18) {\small Да};
+\end{tikzpicture}
+\end{center}
+
+\begin{center}
+Рисунок 2.1 — Блок --- схема алгоритма решения
+\end{center} 
+
+Программа, реализирующая метод пристрелки, реализована на языке Python. Исходный код программы отнесён в Приложение А.
+
+\subsection{\normalsizeРезультаты расчётов и выводы}
+\begin{center}
+\includegraphics{pic22.png}
+Рисунок 2.2 - график решения краевой задачи $(2.18)$ --- $(2.20)$
+\end{center}
+
+Рассмотрим график на рисиунке 2.2. По виду данного графика можно сделать следующие выводы:
+\begin{itemize}
+\item[-]Скорость течения жидкости вблизи пластины равна скорости движения пластины;
+\item[-]Скорость движения жидкости вдали от пластины стремится к нулю.
+\end{itemize}
+
+\newpage
+
+\section{\largeСЛУЧАЙ НЕНЬЮТОНОВСКИХ СРЕД}
+\subsection{\normalsizeПостановка задачи}
+
+Течение степенной неньютоновской жидкости вблизи поверхности пластины, приведённой в состояние равноускоренного движения, описывается уравнением:
+\begin{equation*}
+\rho \frac{\partial u}{\partial t} = \mu_* n\bigg|\frac{\partial u}{\partial y}\bigg|^{n-1} \ \frac{\partial^2 u}{\partial y^2}
+\eqno{(3.1)}
+\end{equation*}
+
+Гранчные условия на поверхности пластины имеют вид
+
+\begin{equation*} при t > 0, \  y = 0: u = U = At. \eqno(3.2) \end{equation*}
+
+Граничные условия вдали пластины (<<на бесконечности>>) имеют вид
+
+\begin{equation*} при t > 0, \ y \rightarrow \infty: u \rightarrow 0. \eqno(3.3) \end{equation*}
+
+Начальные условия:
+
+\begin{equation*} при t = 0, \ y \geqslant 0 : u = 0. \eqno(3.4) \end{equation*}
+
+\subsection{\normalsizeПостановка краевой задачи в автомодельных переменных}
+
+Введём масштабные величины. Пусть $T$ - масштаб времени, $Y$ - масштаб координаты $y$, $U$ - масштаб продольной составляющей скорости жидкости. Тогда можно ввести безразмерные переменные по следующим формулам:
+ 
+\begin{equation*} t = T \ \overline{t}, \eqno(3.5) \end{equation*}
+\begin{equation*} y = Y \ \overline{y}, \eqno(3.6) \end{equation*}
+\begin{equation*} u = U\ \overline{u} =  AT \ \overline{u}( \overline{t}, \ \overline{y}), \eqno(3.7) \end{equation*}
+где $ \ \overline{u}, \ \overline{t}, \ \overline{y}$ --- соответствующе безразмерные представители.
+
+Перейдём в уравнении $(3.1)$ к безразмерным переменным. Для этого подставим $(3.5)$ --- $(3.7)$ в $(3.1)$. Получим соотношение:
+\begin{equation*} \frac{AT}{T}\frac{\partial\overline{u}}{\partial\overline{t}} = \frac{\mu_*n}{\rho} \bigg| \frac{AT}{Y} \frac{\partial \overline{u}}{\partial \overline{y}} \bigg|^{n-1}  \frac{AT}{Y^2} \frac{\partial^2 \overline{u}}{\partial \overline{y}^2}. \eqno(3.8) \end{equation*}
+Запишем последнее выражение в упрощённом виде:
+\begin{equation*} \frac{\partial\overline{u}}{\partial\overline{t}} = \frac{\mu_*n}{\rho} \bigg| \frac{AT}{Y} \frac{\partial \overline{u}}{\partial \overline{y}} \bigg|^{n-1}  \frac{T}{Y^2} \frac{\partial^2 \overline{u}}{\partial \overline{y}^2}. \eqno(3.8') \end{equation*}
+Масштабы в левой и правой частях $(3.8')$ должны совпадать:
+
+\begin{equation*} 1 = \frac{\mu_*}{\rho} n A^{n-1}T^{n} \frac{1}{Y^{n+1}}. \eqno(3.9) \end{equation*}
+Следовательно,
+\begin{equation*} Y =\bigg[\frac{\mu_*}{\rho} n A^{n-1}T^{n}\bigg]^{\frac{1}{n+1}}. \eqno(3.10) \end{equation*}
+Подставляя $(3.5)$, $(3.6)$ и $(3.10)$  в $(3.7)$, получим 
+
+\begin{equation*}
+u = AT \ \overline{u}\bigg(\frac{t}{T}, \frac{y}{Y}\bigg).
+\end{equation*}
+
+В постановку задачи, то есть в уравнение $(3.1)$ и граничные условия $(3.2),(3.3)$ не входит масштаб времени $T$, поэтому в решении задачи для функции $u$ не должен входит масштаб $T$.
+Проведём ряд тождественных преобразований, которые позволят уменьшить присутствие масштаба времени $T$ в функции $u$:
+\begin{equation*}
+u = AT\overline{u}(\overline{t}, \ \overline{y}) = AT\overline{u}\bigg(\frac{t}{T}, \frac{y}{Y}\bigg) = AT\overline{u}\bigg(\frac{t}{T}, \ y\bigg[ \frac{\mu_*}{\rho} n A^{n-1}T^{n} \bigg]^{-\frac{1}{n+1}}\bigg) = \end{equation*}
+\begin{equation*}= AT\frac{t}{T}\frac{T}{t}\overline{u}\bigg( \frac{t}{T},y \ \bigg[ \frac{\mu_*}{\rho} n A^{n-1}T^{n} \bigg]^{-\frac{1}{n+1}} \ \bigg[ \frac{t}{T} \bigg]^{-\frac{n}{n+1}}  \ \bigg[ \frac{T}{t} \bigg]^{-\frac{n}{n+1}} \bigg) = \end{equation*}
+\begin{equation*}
+= At\overline{u}\bigg( \frac{t}{T}, y\bigg[ \frac{\mu_*}{\rho} n A^{n-1}t^n \bigg]^{-\frac{1}{n+1}} \bigg[\frac{T}{t}\bigg]^{-\frac{n}{n+1}} \bigg)\frac{T}{t} = Atg\bigg( \frac{t}{T}, y\bigg[ \frac{\mu_*}{\rho}nA^{n-1}t^n \bigg]^{-\frac{1}{n+1}} \bigg).
+\end{equation*}
+
+Так как решение задачи для функции $u$ не зависит от масштаба $T$, то функция $g$ в предыдущем выражении не зависит от первого аргумента, тогда получаем следующее соотношение:
+
+\begin{equation*} u = At \varphi(\eta), \eqno(3.11) \end{equation*}
+где $\eta = \big[ \frac{\mu_*}{\rho}nA^{n-1}t^n \big]^{-\frac{1}{n+1}}.$
+
+Вычислим частные производные функции $\eta$ по всем параметрам:
+\begin{equation*} \frac{\partial\eta}{\partial t} = \frac{\partial}{\partial t}\bigg[ y\bigg( \frac{\mu_*}{\rho}n A^{n-1}t^n \bigg)^{-\frac{1}{n+1}} \bigg] = -\frac{n}{n+1}\frac{\eta}{t}, \eqno(3.12) \end{equation*}
+\begin{equation*} \frac{\partial\eta}{\partial y} = \bigg[ \frac{\mu_*}{\rho}n A^{n-1}t^{n} \bigg]^{-\frac{1}{n+1}}. \eqno(3.13) \end{equation*}
+
+На основе полученных соотношений можно вычислить все частные прозводные функции $u$:
+
+\begin{equation*}
+1. \ \frac{\partial u}{\partial t} = \frac{\partial}{\partial t}(At\varphi(\eta)) = A\bigg( \varphi(\eta) + t\frac{\partial\varphi}{\partial t} \bigg),\eqno(3.14)
+\end{equation*}
+c учётом того, что
+\begin{equation*}
+\frac{\partial\varphi}{\partial t} = \frac{d\varphi}{d\eta}\frac{\partial\eta}{\partial t},
+\end{equation*}
+получаем c помощью $(3.12)$:
+
+\begin{equation*}
+\frac{\partial u}{\partial t} = A\bigg( \varphi(\eta) - \frac{n}{n+1}\eta\frac{\partial\varphi}{\partial t} \bigg).\eqno(3.15)
+\end{equation*}
+
+\begin{equation*}
+2. \ \frac{\partial u}{\partial y} = \frac{\partial}{\partial y}(At\varphi(\eta)) = At\frac{\partial \varphi(\eta)}{\partial y} = At \ \frac{d\varphi}{d\eta} \ \frac{\partial \eta}{\partial y}.\eqno(3.16)
+\end{equation*}
+При подстановке $(3.13)$ в $(3.16)$ получим 
+\begin{equation*}
+\ \frac{\partial u}{\partial y} = At \bigg[ \frac{\mu_*}{\rho}n A^{n-1}t^{n} \bigg]^{-\frac{1}{n+1}}\frac{d \varphi}{d \eta}.
+\eqno(3.17)
+\end{equation*}
+А значит,
+\begin{equation*}
+\frac{\partial^2 u}{\partial y^2} = At\bigg[ \frac{\mu_*}{\rho}n A^{n-1}t^{n} \bigg]^{-\frac{2}{n+1}}\frac{d^2 \varphi}{d \eta^2}.
+\eqno(3.17')
+\end{equation*}
+
+Для получения дифференциального уравнения в автомодельных переменных подставим $(3.15)$, $(3.17)$, $(3.17')$ в $(3.1)$. Далее приведён основной ход решений для получения дифференциального уравнения в автомодельных переменных.
+
+\begin{equation*} A\bigg[\varphi - \frac{n}{n+1}\eta \ \frac{d\varphi}{d\eta}\bigg] = \frac{\mu_*}{\rho}n\bigg| At\bigg( \frac{\mu_*}{\rho}n A^{n-1}t^n \bigg)^{-\frac{1}{n+1}} \ \frac{d\varphi}{d\eta} \bigg|^{n-1} \ At\bigg[ \frac{\mu_*}{\rho}n A^{n-1}t^{n} \bigg]^{-\frac{2}{n+1}} \ \frac{d^2\varphi}{d\eta^2}, \end{equation*}
+\begin{equation*}\varphi - \frac{n}{n+1}\eta \ \frac{d\varphi}{d\eta}= \frac{\mu_*}{\rho} n t \bigg[ A t \bigg]^{n-1}\bigg[ \frac{\mu_*}{\rho} n A^{n-1}t^{n} \bigg]^{-\frac{n-1}{n+1}}\bigg[ \frac{\mu_*}{\rho} n A^{n-1}t^{n} \bigg]^{-\frac{2}{n+1}}\bigg|\frac{d\varphi}{d\eta} \bigg|^{n-1}\frac{d^2\varphi}{d\eta^2}, \end{equation*}
+\begin{equation*}\varphi - \frac{n}{n+1}\eta \ \frac{d\varphi}{d\eta}= \bigg[\frac{\mu_*}{\rho} n\bigg]^{1-\frac{2}{n+1}-\frac{n-1}{n+1}} A^{\frac{(n-1)(n+1) - (n-1)^2 -2(n-1)}{n+1}}t^{\frac{(n-1)(n+1) - n(n-1) - n + 1}{n+1}} \bigg|\frac{d\varphi}{d\eta} \bigg|^{n-1}\frac{d^2\varphi}{d\eta^2}, \end{equation*}
+\begin{equation*} \bigg|\frac{d\varphi}{d\eta} \bigg|^{n-1}\frac{d^2\varphi}{d\eta^2} + \frac{n}{n+1}\eta\frac{d\varphi}{d\eta} - \varphi = 0. \eqno(3.18) \end{equation*}
+
+Заметим, что при $n = 1$ в (3.12) мы получаем в точности случай ньютоновской жидкости.
+
+Используя граничные условия $(3.2)$, $(3.3)$ и выражение для независимой автомодельной переменной $\eta$, составим граничные условия для функции $\varphi(\eta):$
+
+\begin{equation*}
+\text{при} \ \eta = 0: \varphi(\eta) = 1,
+\eqno(3.19)
+\end{equation*}
+\begin{equation*}
+\text{при} \ \eta\rightarrow \infty: \varphi(\eta)\rightarrow 0.
+\eqno(3.20)
+\end{equation*}
+
+В итоге получаем краевую задачу $(3.18)$ --- $(3.20)$ с граничными условиями $(3.19)$, $(3.20).$
+Решение, как и в случае с ньютоновской жидкостью, будем искать методом пристрелки. При этом необходимо решить краевую задачу с разными значениями параметра $n$ и исследовать различия полученных решений. Функции $f$ и $g$, смысл которых в методе пристрелки был приведён ранее, имеют следующий вид:
+\begin{equation*}
+f(\eta, \varphi, \psi) = \psi, \ g(\eta, \varphi, \psi) = \bigg[ \varphi - \frac{n}{n+1}\eta \psi \bigg]|\psi|^{1-n}.
+\eqno(3.21)
+\end{equation*}
+\newpage
+\subsection{\normalsizeРезультаты расчётов и выводы}
+\begin{center}
+\includegraphics{pic31.png}
+
+Рисунок 3.1 - график решений краевых задач $(3.18)$ --- $(3.20)$ с разными параметрами $n$
+\end{center}
+
+Рассмотрим график на рисиунке 3.1. По виду данного графика можно сделать следующие выводы:
+\begin{itemize}
+\item[-]Скорость течения вблизи жидкости равна скорости движения пластины;
+\item[-]Скорость движения жидкости вдали от пластины стремится к нулю;
+\item[-]Чем больше n, тем быстрее убывает функция $\varphi$, а значит тем меньше область жидкости рядом с пластиной, где есть какое-то влияние на скорость течения жидкости от движения пластины. 
+\end{itemize}
+
+
+На рисунке 3.2 показана зависимость параметра $\alpha$, при котором выполняется условие $|\Phi(\alpha)| \leq \varepsilon$, от параметра $n$ для соответсвующей краевой задачи $(3.18)$ --- $(3.20)$ .
+
+Пусть $\eta_0$ --- первое значение переменной $\eta$, при котором $\varphi \leq \varepsilon$. Тогда на рисунке 3.3 показана зависимость параметра $\eta_0$ от параметра $n$ для соответсвующей краевой задачи $(3.18)$ --- $(3.20)$ .
+
+\begin{center}
+\includegraphics{32.png}
+
+Рисунок 3.2 - зависимость параметра $\alpha$, при котором выполняется условие $|\Phi(\alpha)| \leq \varepsilon$, от параметра $n$ для соответсвующей краевой задачи $(3.18)$ --- $(3.20)$
+\end{center}
+
+\begin{center}
+\includegraphics{33.png}
+
+Рисунок 3.3 - зависимость параметра $\eta_0$ от параметра $n$ для соответсвующей краевой задачи $(3.18)$ --- $(3.20)$
+\end{center}
+
+\newpage
+\section*{\begin{center}\largeЗАКЛЮЧЕНИЕ\end{center}}
+\addcontentsline{toc}{section}{ЗАКЛЮЧЕНИЕ}
+Рассмотрена задача о движении жидкости под действием пластины, приведённой в равноускоренное движение. Установлено, что задача является автомодельной. Получены уравнения, описывающие автомодельное течение. При этом искомыми переменными являются $\eta$ и $\varphi$.
+
+Для переменных $\eta$ и $\varphi$ сформулирована краевая задача, которая решена с помощью метода пристрелки, в ходе которой задачи Коши были решены с помощью метода Рунге --- Кутты 4 -- го порядка, а для нахождения очередного приближения параметра в нелинейной задаче для граничного условия был использован метод Ньютона.
+
+Течение в пограничном слое изучено как для случая ньютоновских жидкостей, так и для случая степенных неньютоновских жидкостей. Расчёты произведены для различных значений параметров задачи.
+
+Полученные расчёты позволили выяснить, что важную роль играет параметр, характеризующий вязкость жидкости. Чем меньше данный параметр, тем больше рядом с пластиной область жидкости, на течение которой как-то влияет равноускоренное движение пластины.
+
+\newpage
+\section*{\begin{center}\largeСПИСОК ИСПОЛЬЗОВАННЫХ ИСТОЧНИКОВ\end{center}}
+\addcontentsline{toc}{section}{СПИСОК ИСПОЛЬЗОВАННЫХ ИСТОЧНИКОВ}
+\begin{itemize}
+\item[1.]Лойцянский Л. Г. Ламинарный пограничный слой. М.: Физматлит, 1962. 479с.
+\item[2.]Шлихтинг Г. Теория пограничного слоя. М.: Наука, 1974. 712с
+\end{itemize}
+\newpage
+\section*{\begin{center}\largeПРИЛОЖЕНИЕ А\end{center}}
+\addcontentsline{toc}{section}{А Исходный код программы}
+\begin{center}\textbf{Исходный код программы}\end{center}
+\lstset{ %
+language=Python,                 % выбор языка для подсветки (здесь это С)
+basicstyle=\small\sffamily, % размер и начертание шрифта для подсветки кода
+numbers=left,               % где поставить нумерацию строк (слева\справа)
+numberstyle=\tiny,           % размер шрифта для номеров строк
+stepnumber=1,                   % размер шага между двумя номерами строк
+numbersep=5pt,                % как далеко отстоят номера строк от подсвечиваемого кода
+backgroundcolor=\color{white}, % цвет фона подсветки - используем \usepackage{color}
+showspaces=false,            % показывать или нет пробелы специальными отступами
+showstringspaces=false,      % показывать или нет пробелы в строках
+showtabs=false,             % показывать или нет табуляцию в строках
+frame=single,              % рисовать рамку вокруг кода
+tabsize=2,                 % размер табуляции по умолчанию равен 2 пробелам
+captionpos=t,              % позиция заголовка вверху [t] или внизу [b] 
+breaklines=true,           % автоматически переносить строки (да\нет)
+breakatwhitespace=false, % переносить строки только если есть пробел
+escapeinside={\%*}{*)}   % если нужно добавить комментарии в коде
+}
+\begin{lstlisting}[label=some-code,caption=PROGRAM CODE OF SHOOTING METHOD]
+import pprint
+import math
+# segment's parameters
+leftEdgeOfSegment = 0
+rightEdgeOfSegment = 5
+leftValue = 1
+rightValue = 0
+# shooting method's parameters
+epsilon = 0.01
+step = 0.08
+quantityOfNodes = int((rightEdgeOfSegment - leftEdgeOfSegment) / step)
+# main equation's parameters
+def f(eta, phi, psi):
+    return psi
+
+
+def g(eta, phi, psi, n):
+    return (phi - (n / (n + 1)) * eta * psi) * (abs(psi) ** (1 - n))
+
+
+def createEtaGrid():
+    etaGrid = []
+    for i in range(quantityOfNodes):
+        etaGrid.append(leftEdgeOfSegment + i * step)
+    return etaGrid
+
+
+etaGrid = createEtaGrid()
+etaGridLength = len(etaGrid)
+
+# Cauchy problem
+def RungeKuttaMethod(eta, n):
+    phiValues = []
+    psiValues = []
+    phiValues.append(leftValue)
+    psiValues.append(eta)
+    for i in range(1, etaGridLength):
+        k1 = step * f(etaGrid[i - 1], phiValues[i - 1], psiValues[i - 1])
+        l1 = step * g(etaGrid[i - 1], phiValues[i - 1], psiValues[i - 1], n)
+        k2 = step * f(etaGrid[i - 1] + 0.5 * step, phiValues[i - 1] + 0.5 * k1, psiValues[i - 1] + 0.5 * l1)
+        l2 = step * g(etaGrid[i - 1] + 0.5 * step, phiValues[i - 1] + 0.5 * k1, psiValues[i - 1] + 0.5 * l1, n)
+        k3 = step * f(etaGrid[i - 1] + 0.5 * step, phiValues[i - 1] + 0.5 * k2, psiValues[i - 1] + 0.5 * l2)
+        l3 = step * g(etaGrid[i - 1] + 0.5 * step, phiValues[i - 1] + 0.5 * k2, psiValues[i - 1] + 0.5 * l2, n)
+        k4 = step * f(etaGrid[i - 1] + step, phiValues[i - 1] + k3, psiValues[i - 1] + l3)
+        l4 = step * g(etaGrid[i - 1] + step, phiValues[i - 1] + k3, psiValues[i - 1] + l3, n)
+        dy = (k1 + 2 * k2 + 2 * k3 + k4) / 6
+        dz = (l1 + 2 * l2 + 2 * l3 + l4) / 6
+        phiValues.append(phiValues[i - 1] + dy)
+        psiValues.append(psiValues[i - 1] + dz)
+    return phiValues
+
+
+# shooting method
+def shootingMethod(alpha0, alpha1, phi0, phi1, recCount, n):
+    F0 = phi0[len(phi0) - 1] - rightValue
+    F1 = phi1[len(phi1) - 1] - rightValue
+    FR1 = 0
+    if abs(F0) < epsilon:
+        print("alphaForB")
+        print(alpha0)
+        print("recCount")
+        print(recCount)
+        return F0
+    elif abs(F1) < epsilon:
+        print("alphaForB")
+        print(alpha1)
+        print("recCount")
+        print(recCount)
+        return F1
+    else:
+        while abs(F1) > epsilon:
+            if int(F1 - F0) == 0:
+                F0 += 0.01
+            alpha2 = alpha1 - ((alpha1 - alpha0) / (F1 - F0)) * F1
+            F0 = F1
+            FR1 = RungeKuttaMethod(alpha2, n)
+            F1 = FR1[len(FR1) - 1] - rightValue
+            alpha0 = alpha1
+            alpha1 = alpha2
+            recCount += 1
+        print("alphaForB")
+        print(alpha1)
+        print("recCount")
+        print(recCount)
+        return [FR1, alpha1]
+
+
+def findEtaToZeroValue(phi):
+    res = 0
+    for i in range(etaGridLength):
+        if abs(phi[i] - rightValue) < epsilon:
+            res = etaGrid[i]
+            break
+    return res
+
+# execution
+
+n = [0.2,0.4,0.6,0.8,1,1.2,1.4,1.6,1.8,2,2.2]
+string = []
+alpha = []
+etaToZero = []
+rightForCauchyValue = math.tan(
+    0.0174532925 * (rightValue - leftValue) / (rightEdgeOfSegment - leftEdgeOfSegment))
+for nc in n:
+    shootingMethodRes = shootingMethod(rightForCauchyValue,
+                                       rightForCauchyValue - nc,
+                                       RungeKuttaMethod(rightForCauchyValue, nc),
+                                       RungeKuttaMethod(rightForCauchyValue - nc, nc), 0, nc)
+    phi = shootingMethodRes[0]
+    alpha.append(shootingMethodRes[1])
+    phiLength = len(phi)
+    for i in range(phiLength):
+        if phi[i] < 0:
+            phi[i] = epsilon / 10
+    eta0 = findEtaToZeroValue(phi)
+    etaToZero.append(eta0)
+    print("etaToZeroValue = " + str(eta0))
+    ncString = 'plot('  # for Scilab using
+    strEta = '['
+    strPhi = '['
+    for i in range(phiLength):
+        strEta += str(round(etaGrid[i], 3))
+        strPhi += str(round(phi[i], 11))
+        if not i == phiLength - 1:
+            strEta += ','
+            strPhi += ','
+    ncString += \
+        strEta + '],' + \
+        strPhi + ']' + \
+        ",'k');" \
+        "xgrid();ylabel('$$\\varphi$$','interpreter','latex','fontsize',5,'rotation',0);" \
+        "xlabel('$$\eta$$','interpreter','latex','fontsize',5);" \
+        "xset('font',4,3); \n"
+    string.append(ncString)
+    pprint.pprint(phi)
+
+stringForWriting = ""
+stringLength = len(string)
+for j in range(stringLength):
+    stringForWriting += string[j]
+f = open("C:\\Users\\Guseyn\\PycharmProjects\\kursn\\text", 'w')
+f.write(stringForWriting)
+
+alphaStringForWriting = '\n plot('
+etaToZeroStringForWriting = '\n plot('
+alphaLength = len(alpha)
+nString = '['
+alphaString = '['
+etaToZeroString = '['
+for j in range(alphaLength):
+    nString += str(n[j])
+    alphaString += str(round(alpha[j], 11))
+    etaToZeroString += str(round(etaToZero[j], 11))
+    if not j == alphaLength - 1:
+        nString += ','
+        alphaString += ','
+        etaToZeroString += ','
+alphaStringForWriting +=\
+    nString + '],' +\
+    alphaString + ']' + \
+    ",'k');" \
+    "xgrid();ylabel('$$\\alpha$$','interpreter','latex','fontsize',5,'rotation',0);" \
+    "xlabel('$$n$$','interpreter','latex','fontsize',5);" \
+    "xset('font',4,3); \n"
+etaToZeroStringForWriting +=\
+    nString + '],' +\
+    etaToZeroString + ']' + \
+    ",'k');" \
+    "xgrid();ylabel('$$\\eta_0$$','interpreter','latex','fontsize',5,'rotation',0);" \
+    "xlabel('$$n$$','interpreter','latex','fontsize',5);" \
+    "xset('font',4,3); \n"
+f.write(alphaStringForWriting)
+f.write(etaToZeroStringForWriting)
+f.close()
+\end{lstlisting}
+\end{document}

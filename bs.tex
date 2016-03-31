@@ -1,0 +1,67 @@
+\documentclass[14pt]{extreport}
+\usepackage{gost}
+\usepackage{tikz}
+\usepackage{listings}
+\usepackage{lscape}
+\usetikzlibrary{shapes.geometric}
+\begin{document}
+\pagenumbering{gobble}% Remove page numbers (and reset to 1)
+\begin{landscape}
+\vspace*{-3.0cm}
+\begin{center}
+\begin{tikzpicture}[node distance = 2cm, auto]
+block/.style={
+draw,
+fill=white,
+rectangle, 
+minimum width={width("Достаточно длинный текст, чтобы быть нормой")+2pt}
+}
+\node[ellipse, draw] at (2,2.2){Начало};
+\draw[thick,->]  (2,1.70) -- (2,1.06);
+\node [rectangle, draw, xslant=0.4] at (2,0.68) {
+  \small Ввод исходных данных $T,\ \Lambda^0,\ \Lambda^T,\ \alpha_1,\ \alpha_2,\ \alpha_3,\ \varepsilon$
+};
+\draw[thick,->]  (2, 0.29) -- (2, -0.35);
+\node [rectangle, draw] at (2, -0.78) {
+  \smallСоставление задачи Коши с очередным приближением $\Psi_0^{(k)}$
+};
+\draw[thick,->]  (2, -1.20) -- (2, -1.85);
+\node [rectangle, draw] at (2, -2.26) {
+  \smallНахождение главной невязки $F(\Psi_0^{(k)}) = D^{(k)}$
+};
+\draw[thick,->]  (2, -2.68) -- (2, -3.33);
+\node [draw, diamond, aspect=2,text width=8em,inner sep=2pt,text centered] at(2, -4.68) {
+  \small $\sum_{i=0}^{3}\big|d_i^{(k)}\big| \ <\ \varepsilon$
+};
+\draw[thick,->]  (2, -6.0) -- (2, -7.00);
+\draw[thick,->]  (-0.65, -4.68) -- (-4.65, -4.68);
+\node[] at (-2, -4.4) {\small Да};
+\node[] at (2.50, -6.5) {\small Нет};
+\node[ellipse, draw] at (-5.85, -4.7){Конец};
+\node [rectangle, draw] at (2, -7.68) {
+  \small Построение СЛАУ: $\sum_{i=0}^{3}\dfrac{dF_i^{(k)}}{d\Psi}\gamma_i = -F(\Psi_0^{(k)})$
+};
+\draw[thick,->]  (2, -8.36) -- (2, -9.01);
+\node [rectangle, draw] at (2, -9.45) {
+  \small Нахождение невязки для $\Psi_0^{(k + 1)} = \Psi_0^{(k)} + \chi\Gamma$: $F(\Psi_0^{(k + 1)}) = D^{(k + 1)}$
+};
+\draw[thick,->]  (2, -9.90) -- (2, -10.55);
+\node [draw, diamond, aspect=2,text width=12em,inner sep=2pt,text centered] at(2, -12.4) {
+  \small $\sum_{i=0}^{3}\big|d_i^{(k + 1)}\big| \ <\ \sum_{i=0}^{3}\big|d_i^{(k)}\big|$
+};
+\draw[thick,-]  (5.7, -12.40) -- (10.2, -12.40);
+\draw[thick,-]  (10.2, -12.40) -- (10.2, -0.8);
+\draw[thick,->]  (10.2, -0.80) -- (7.84, -0.80);
+\node[] at (7.2, -12.1) {\small Да};
+\draw[thick,->]  (2, -14.2) -- (2, -15.2);
+\node[] at (2.5, -14.7) {\small Нет};
+\node [rectangle, draw] at (2, -15.76) {
+  \small $\chi\ :=\ \dfrac{\chi}{2}$
+};
+\draw[thick,-]  (1.05, -15.76) -- (-6, -15.76);
+\draw[thick,-]  (-6, -15.76) -- (-6, -9.5);
+\draw[thick,->]  (-6, -9.5) -- (-4.2, -9.5);
+\end{tikzpicture}
+\end{center}
+\end{landscape}
+\end{document}
